@@ -25,7 +25,6 @@
  */
 
 import Foundation
-import Compression
 
 struct ZipFileInfo {
     let filename: String
