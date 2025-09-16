@@ -1,5 +1,14 @@
-import UnzipHttp from './NativeUnzipHttp';
+import UnzipHttp, { type ZipFileInfo } from './NativeUnzipHttp';
 
-export function multiply(a: number, b: number): number {
-  return UnzipHttp.multiply(a, b);
+export function downloadFileData(
+  zipURL: string,
+  fileInfo: ZipFileInfo
+): Promise<{ data: string }> {
+  return UnzipHttp.downloadFileData(zipURL, fileInfo);
 }
+
+export function listFiles(zipURL: string): Promise<ZipFileInfo[]> {
+  return UnzipHttp.listFiles(zipURL);
+}
+
+export { type ZipFileInfo };
