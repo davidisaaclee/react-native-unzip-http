@@ -107,7 +107,7 @@ RCT_EXPORT_MODULE()
                                                  compressionMethod:fileInfo.compressionMethod()
                                                           dateTime:datetime];
   NSURL *targetURL = [NSURL URLWithString:targetPath];
-  if (!targetURL || [[targetURL scheme] isEqualToString: @"file"]) {
+  if (!targetURL || ![[targetURL scheme] isEqualToString: @"file"]) {
     reject(@"unzip-http-invalid-target-path", @"Invalid target path", nil);
     return;
   }
