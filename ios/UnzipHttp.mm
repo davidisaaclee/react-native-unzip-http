@@ -106,12 +106,17 @@ RCT_EXPORT_MODULE()
                                                       headerOffset:fileInfo.headerOffset()
                                                  compressionMethod:fileInfo.compressionMethod()
                                                           dateTime:datetime];
+  NSURL *targetURL = [NSURL URLWithString:targetPath];
+  if (!targetURL || [[targetURL scheme] isEqualToString: @"file"]) {
+    reject(@"unzip-http-invalid-target-path", @"Invalid target path", nil);
+    return;
+  }
   [self.impl download:fileInfoConverted inZipURL:[NSURL URLWithString:zipURL] completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
     if (error != nil) {
       reject(@"unzip-http-failed-download", @"Failed to download zip file content", error);
     } else {
       NSError* error;
-      [data writeToFile:targetPath options:NSDataWritingAtomic error:&error];
+      [data writeToURL:targetURL options:NSDataWritingAtomic error:&error];
       if (error) {
         reject(@"unzip-http-failed-write", @"Failed to write content to file", error);
       } else {
