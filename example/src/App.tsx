@@ -1,3 +1,4 @@
+import * as fs from 'expo-file-system';
 import * as React from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -16,6 +17,11 @@ import {
   type ZipFileInfo,
 } from 'react-native-unzip-http';
 
+// idk why the File constructor isn't correctly joining paths when I pass them as separate args.
+// This works.
+const TARGET_SAVE_FILE = new fs.File([fs.Paths.cache.uri, 'downloaded_image.png'].join('/'));
+const TARGET_SAVE_PATH = TARGET_SAVE_FILE.uri.slice('file://'.length);
+
 const ZIP_FILE_URL =
   'https://archive.org/download/astoundingstorie28617gut/28617-h.zip';
 
@@ -30,7 +36,7 @@ export default function App() {
   React.useEffect(() => {
     (async () => {
       const fileList = await listFiles(ZIP_FILE_URL);
-      console.log('fileList', fileList);
+      // console.log('fileList', fileList);
       setFiles(fileList);
     })().catch((err) => {
       Alert.alert('Error', err.message);
@@ -52,6 +58,7 @@ export default function App() {
     (async () => {
       const result = await downloadFileData(ZIP_FILE_URL, selectedFile.info);
       setSelectedFile({ info: selectedFile.info, data: result.data });
+      await downloadFileData(ZIP_FILE_URL, selectedFile.info, TARGET_SAVE_PATH);
     })().catch((err) => {
       Alert.alert('Error', err.message);
     });
@@ -88,6 +95,15 @@ export default function App() {
                 )}
               </>
             )}
+
+            {/* Requires app reload to see changes to the image file */}
+            <Image
+              source={{ uri: TARGET_SAVE_FILE.uri }}
+              width={100}
+              height={100}
+              resizeMode="contain"
+            />
+
             <FlatList
               style={{ flex: 1, width: '100%' }}
               data={files}

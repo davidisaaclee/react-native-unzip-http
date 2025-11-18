@@ -23,6 +23,11 @@ export interface Spec extends TurboModule {
     zipURL: string,
     fileInfo: ZipFileInfo
   ): Promise<{ data: string }>;
+  downloadFileDataToFile(
+    zipURL: string,
+    fileInfo: ZipFileInfo,
+    targetPath: string
+  ): Promise<void>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('UnzipHttp');

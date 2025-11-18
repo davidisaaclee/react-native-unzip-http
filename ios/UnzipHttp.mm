@@ -88,4 +88,38 @@ RCT_EXPORT_MODULE()
   }];
 }
 
+- (void)downloadFileDataToFile:(NSString *)zipURL
+                      fileInfo:(JS::NativeUnzipHttp::ZipFileInfo &)fileInfo
+                    targetPath:(NSString *)targetPath
+                       resolve:(RCTPromiseResolveBlock)resolve
+                        reject:(RCTPromiseRejectBlock)reject
+{
+  Datetime *datetime = [[Datetime alloc] initWithYear:fileInfo.dateTime().year()
+                                                month:fileInfo.dateTime().month()
+                                                  day:fileInfo.dateTime().day()
+                                                 hour:fileInfo.dateTime().hour()
+                                               minute:fileInfo.dateTime().minute()
+                                               second:fileInfo.dateTime().second()];
+  FileInfo *fileInfoConverted = [[FileInfo alloc] initWithFilename:fileInfo.filename()
+                                                          fileSize:fileInfo.fileSize()
+                                                    compressedSize:fileInfo.compressedSize()
+                                                      headerOffset:fileInfo.headerOffset()
+                                                 compressionMethod:fileInfo.compressionMethod()
+                                                          dateTime:datetime];
+  [self.impl download:fileInfoConverted inZipURL:[NSURL URLWithString:zipURL] completionHandler:^(NSData * _Nullable data, NSError * _Nullable error) {
+    if (error != nil) {
+      reject(@"unzip-http-failed-download", @"Failed to download zip file content", error);
+    } else {
+      NSError* error;
+      [data writeToFile:targetPath options:NSDataWritingAtomic error:&error];
+      if (error) {
+        reject(@"unzip-http-failed-write", @"Failed to write content to file", error);
+      } else {
+        resolve(nil);
+      }
+    }
+  }];
+
+}
+
 @end
